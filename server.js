@@ -12,6 +12,10 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.send("Alive");
+});
+
 app.use("/api/movies", movieRoutes);
 
 app.use("/search", searchRoutes);
