@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "NODE_ENV=development nodemon server",
-    "start":"node server",
+    "start": "node server.js",
     "db:migrate": "node ./services/db createTables",
     "db:migrate:undo": "node ./services/db removeTables",
     "db:seed": "node ./services/seedData seedTableData"
