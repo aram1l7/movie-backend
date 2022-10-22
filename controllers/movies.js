@@ -1,11 +1,20 @@
 const createOrSelectUser = require("../queries/createUser");
 const matchUserMovie = require("../queries/matchUserMovie");
-const axios = require("axios");
 const { toLowerKeys } = require("../utils");
+const axios = require("axios");
+
 require("dotenv").config();
+
 const getAll = async (req, res) => {
+  req.redis.get("movies", (err, data) => {
+    if (err) console.log(err);
+    if (data != null) {
+      return res.status(200).json(JSON.stringify(data));
+    }
+  });
   try {
     const { rows } = await req.client.query(`SELECT * FROM movies`);
+    req.redis.set("movies", JSON.stringify(rows), "EX", 60 * 60 * 24);
     return res.status(200).json(rows);
   } catch (error) {
     console.log(error, "error");
@@ -14,10 +23,17 @@ const getAll = async (req, res) => {
 };
 
 const getFavorites = async (req, res) => {
+  req.redis.get("favorites", (err, data) => {
+    if (err) console.log(err);
+    if (data != null) {
+      return res.status(200).json(JSON.stringify(data));
+    }
+  });
   try {
     const { rows } = await req.client.query(
       `SELECT * FROM movies WHERE is_favorite = true`
     );
+    req.redis.set("favorites", JSON.stringify(rows), "EX", 60 * 60 * 24);
     return res.status(200).json(rows);
   } catch (error) {
     console.log(error, "err");
@@ -26,10 +42,23 @@ const getFavorites = async (req, res) => {
 };
 
 const getById = async (req, res) => {
+  const { id } = req.params;
+  req.redis.get(`movies?id=${id}`, (err, data) => {
+    if (err) console.log(err);
+    if (data != null) {
+      return res.status(200).json(JSON.stringify(data));
+    }
+  });
   try {
     const data = await req.client.query(
       `SELECT * FROM movies WHERE id = ($1)`,
-      [req.params.id]
+      [id]
+    );
+    req.redis.set(
+      `movies?id=${id}`,
+      JSON.stringify(data.rows[0]),
+      "EX",
+      60 * 60 * 24
     );
     return res.status(200).json(data.rows[0]);
   } catch (error) {

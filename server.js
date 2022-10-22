@@ -3,12 +3,14 @@ const { connectDb } = require("./db/connect");
 const app = express();
 const searchRoutes = require("./routes/search");
 const movieRoutes = require("./routes/movies");
-const bodyParser = require("body-parser");
 const cors = require("cors");
-connectDb();
+const { connectRedis } = require("./db/redis");
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+connectDb();
+connectRedis();
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 app.use(cors());
 
@@ -20,5 +22,4 @@ app.use("/api/movies", movieRoutes);
 
 app.use("/search", searchRoutes);
 
-app.listen(process.env.PORT || 4000)
-
+app.listen(process.env.PORT || 4000);
