@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const connectionString =
   process.env.NODE_ENV === "development"
-    ? "postgres://postgres:postgres@127.0.0.1:5432/moviesapp"
+    ? process.env.DB_LOCAL_URL
     : process.env.DB_URL;
 
 const client = new Pool({
